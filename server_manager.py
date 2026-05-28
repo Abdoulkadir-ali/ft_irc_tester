@@ -3,13 +3,15 @@ import time
 import subprocess
 import os
 import sys
+from printer import IRCPrinter
 
 class IRCServerManager:
-    def __init__(self, password="secret", binary_path=None):
+    def __init__(self, password="secret", binary_path=None, printer=None):
         self.password = password
         self.host = "127.0.0.1"
         self.port = 0
         self.proc = None
+        self.printer = printer or IRCPrinter()
         
         if binary_path is None:
             self.binary = self._find_binary()
@@ -17,7 +19,7 @@ class IRCServerManager:
             self.binary = os.path.realpath(binary_path)
 
         if not self.binary or not os.path.isfile(self.binary):
-            print(f"  ERREUR : binaire 'ircserv' introuvable ({self.binary or 'Non spécifié'}) — lancez 'make' d'abord.")
+            self.printer.print_error(f"binaire 'ircserv' introuvable ({self.binary or 'Non spécifié'}) — lancez 'make' d'abord.")
             sys.exit(1)
 
     def _find_binary(self):
@@ -53,7 +55,7 @@ class IRCServerManager:
             except OSError:
                 time.sleep(0.05)
         else:
-            print(f"  ERREUR : serveur non accessible sur {self.host}:{self.port} — abandon.")
+            self.printer.print_error(f"serveur non accessible sur {self.host}:{self.port} — abandon.")
             self.stop()
             sys.exit(1)
         

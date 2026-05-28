@@ -16,6 +16,7 @@ if script_dir not in sys.path:
 
 from server_manager import IRCServerManager
 from framework import TestRunner
+from printer import IRCPrinter
 import suites  # Déclenche l'enregistrement des tests
 
 def parse_verbose(val):
@@ -44,8 +45,9 @@ def main():
 
     verbose_level = parse_verbose(args.verbose)
     
-    server_mgr = IRCServerManager(password=args.password, binary_path=args.binary)
-    runner = TestRunner(server_mgr, verbose=verbose_level)
+    printer = IRCPrinter(verbose=verbose_level)
+    server_mgr = IRCServerManager(password=args.password, binary_path=args.binary, printer=printer)
+    runner = TestRunner(server_mgr, printer=printer)
     
     success = runner.run_all()
     sys.exit(0 if success else 1)
